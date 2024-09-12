@@ -17,10 +17,11 @@ $routes = [
         new Route("login","LoginController.php"),
         new Route("logout","LogoutController.php", true),
         new Route("newuser","NewUserController.php", true),
-        new Route("manga_view","MangaViewController.php"),
-        new Route("manga_edit","MangaEditController.php"),
-        new Route("chapter_view","ChapterViewController.php"),
-        new Route("chapter_edit","ChapterEditController.php"),
+        new Route("manga_view","MangaViewController.php", true),
+        new Route("manga_edit","MangaEditController.php", true),
+        new Route("chapter_view","ChapterViewController.php", true),
+        new Route("chapter_edit","ChapterEditController.php", true),
+        new Route("chapter_create","ChapterCreateController.php", true),
         new Route("manga_create","MangaCreateController.php",true),
         // 追加のルートをここに定義
 ];

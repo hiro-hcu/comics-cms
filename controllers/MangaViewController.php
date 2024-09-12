@@ -17,7 +17,7 @@ while ($row = $result->fetch_object()) {
         "name" => $row->name,
         "author_name"=> $row->author_name,
         "summary" => $row->summary,
-        "id"=>$row->id  
+        "manga_id"=>$row->id  
     ];
 }
 

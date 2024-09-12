@@ -8,6 +8,7 @@ if (isset($_SESSION['user_id'])) {
     // SESSION[user_id]に値入っていればログインしたとみなす
     echo "既にログインしています";
     echo "セッション維持ID: " . $_SESSION['user_id'] . "<br/>";
+    header("Location: manga_view");
     exit();
 }
 
@@ -60,8 +61,8 @@ var_dump($password_hash." <br/>"); */
 
 if (!is_null($user_data)) {
     $_SESSION['user_id'] = $user_data['id'];
-    echo "user_id: {$user_data['id']}です。 <br/>";
-    echo 'ログインできました。<br/>';
+    echo "<br>user_id: {$user_data['id']}です。 <br/>";
+    header("Location: manga_view");
     exit();
 
 }

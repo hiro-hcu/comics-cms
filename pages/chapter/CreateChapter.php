@@ -1,10 +1,6 @@
 <?php
+
 echo "<br>chapter作成ページです。";
-
-//manga_idを取得
-$title_id = $_GET['title_id'];
-
-echo "{title_id }: $title_id ";
 
 // 接続
 $mysqli = new mysqli('localhost', 'hirotada', 'hirotada', 'comics');
@@ -13,34 +9,50 @@ $mysqli = new mysqli('localhost', 'hirotada', 'hirotada', 'comics');
 if ($mysqli->connect_error) {
     echo $mysqli->connect_error;
     exit();
-} else {
-    $mysqli->set_charset('utf8');
-}
+} 
 
 //POST通信された時
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+switch ($_SERVER["REQUEST_METHOD"]) {
+    case "GET":
 
-    $name = htmlspecialchars($_POST["name"], ENT_QUOTES);
-    $start_date = date('Y-m-d', strtotime($_POST["start_date"]));
-    
-    if (isset(($name))) {
-        $sql = "INSERT INTO mst_chapters (`title_id`, `name`, `start_date`)values(?, ?, ?)";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param("iss", $title_id, $name, $start_date);
+        //manga_idを取得
+        $title_id = $_GET['title_id'];
+        echo "{title_id }: $title_id ";
+        break;
 
-        if ($stmt->execute()) {
-            echo "追加成功";
-            $stmt->close();
-            $mysqli->close(); 
-            header("Location: chapter_view?manga_id=$title_id");
-        } else {
-            echo "追加に失敗しました";
+    case "POST":
+        $title_id = $_POST["title_id"];
+        echo "{title_idです。POSTの画面}{$title_id}<br>";
+        $name = htmlspecialchars($_POST["name"], ENT_QUOTES);
+        $start_date = date('Y-m-d H:i:s', strtotime($_POST["start_date"]));
+
+         // MEMO: 今の時間
+         if (strtotime(date("Y-m-d H:i:s")) > strtotime($start_date)) {
+            $error = [
+                "message" => "過去の日程は選択できません。",
+                "location" => "chapter_view?manga_id=$title_id"
+            ];
+            include_once __DIR__ . '/../error/500.php';
         }
 
-    }
-    // 切断
-    $stmt->close();
-    $mysqli->close();
+        if (isset(($name))) {
+            $sql = "INSERT INTO mst_chapters (`title_id`, `name`, `start_date`)values(?, ?, ?)";
+            $stmt = $mysqli->prepare($sql);
+            $stmt->bind_param("iss", $title_id, $name, $start_date);
+
+            if ($stmt->execute()) {
+                echo "追加成功";
+
+                header("Location: chapter_view?manga_id=$title_id");
+            } else {
+                echo "追加に失敗しました";
+            }
+
+        }
+        // 切断
+        $stmt->close();
+        $mysqli->close();
+        break;
 }
 ?>
 
@@ -86,7 +98,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: #333;
         }
 
-        input[type="text"], input[type="date"] {
+        input[type="text"],
+        input[type="date"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -118,10 +131,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <p>title_id: <?= htmlspecialchars($title_id) ?></p>
         <form action="" method="post">
             <label for="name">名前:</label>
-            <input type="text" name="name" id="name" value="" required>
+            
+            <input type="hidden" name="title_id" value="<?=$title_id?>" required>
+            <input type="text" name="name" value="" required>
 
             <label for="start_date">開始日:</label>
-            <input type="date" name="start_date" id="start_date" value="" required>
+            <input type="date" name="start_date" value="" required>
 
             <input type="submit" value="登録">
         </form>

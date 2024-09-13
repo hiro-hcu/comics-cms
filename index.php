@@ -34,7 +34,6 @@ foreach ($routes as $r) {
     }
 }
 
-//echo "<br/>matched_route: {$matched_route->getPath()} <br/>";
 
 if (!is_null($matched_route)) {
     $controller = $matched_route->getController();

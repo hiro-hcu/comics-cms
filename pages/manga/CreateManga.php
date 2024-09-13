@@ -13,30 +13,32 @@ if ($mysqli->connect_error) {
 }
 
 // POST通信された時
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+switch ($_SERVER["REQUEST_METHOD"]) {
+    case "POST":
+        //フォームから不正なスクリプトが入力された場合を考えてhtmlspecialcharsを使用→全て文字列と認識
+        $manga_name = htmlspecialchars($_POST["manga_name"], ENT_QUOTES);
+        $author_name = htmlspecialchars($_POST["author_name"], ENT_QUOTES);
+        $summary = htmlspecialchars($_POST["summery"], ENT_QUOTES);
 
-    $manga_name = htmlspecialchars($_POST["manga_name"], ENT_QUOTES);
-    $author_name = htmlspecialchars($_POST["author_name"], ENT_QUOTES);
-    $summary = htmlspecialchars($_POST["summery"], ENT_QUOTES);
+        // マンガ名が追加されている時
+        if (isset($manga_name)) {
+            $sql = "INSERT INTO mst_titles (`name`, `author_name`, `summary`) VALUES (?, ?, ?)";
+            $stmt = $mysqli->prepare($sql);
+            $stmt->bind_param("sss", $manga_name, $author_name, $summary);
 
-    // マンガ名が追加されている時
-    if (isset($manga_name)) {
-        $sql = "INSERT INTO mst_titles (`name`, `author_name`, `summary`) VALUES (?, ?, ?)";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param("sss", $manga_name, $author_name, $summary);
-
-        if ($stmt->execute()) {
-            echo "追加成功";
-            $stmt->close();
-            $mysqli->close();
-            header("Location: manga_view");
-        } else {
-            echo "追加に失敗しました";
+            if ($stmt->execute()) {
+                echo "追加成功";
+                $stmt->close();
+                $mysqli->close();
+                header("Location: manga_view");
+            } else {
+                echo "追加に失敗しました";
+            }
         }
-    }
 
-    $stmt->close();
-    $mysqli->close();
+        $stmt->close();
+        $mysqli->close();
+        break;
 }
 ?>
 <!DOCTYPE html>

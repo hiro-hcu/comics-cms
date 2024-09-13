@@ -1,28 +1,30 @@
 <?php
+
+require_once __DIR__ . "/vendor/autoload.php";
+
 session_start();
 define('__ROOT__', dirname(__FILE__));
 
 require_once(__DIR__.'/route/Route.php');
 
-
-echo 'index.phpです<br/>';
+// echo 'index.phpです<br/>';
 
 //現在アクセスされているパスを取得
 $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $route = trim($request, '/');
-echo "ルートパス「{$route}」 <br/>";
-echo __DIR__;
+// echo "ルートパス「{$route}」 <br/>";
+// echo __DIR__;
 $routes = [
-        new Route("","MangaViewController.php", true),
-        new Route("login","LoginController.php"),
-        new Route("logout","LogoutController.php", true),
-        new Route("newuser","NewUserController.php", true),
-        new Route("manga_view","MangaViewController.php", true),
-        new Route("manga_edit","MangaEditController.php", true),
-        new Route("chapter_view","ChapterViewController.php", true),
-        new Route("chapter_edit","ChapterEditController.php", true),
-        new Route("chapter_create","ChapterCreateController.php", true),
-        new Route("manga_create","MangaCreateController.php",true),
+        new Route("","MangaViewController"),
+        new Route("login","LoginController"),
+        new Route("logout","LogoutController", true),
+        new Route("newuser","NewUserController", true),
+        new Route("manga_view","MangaViewController", true),
+        new Route("manga_edit","MangaEditController", true),
+        new Route("chapter_view","ChapterViewController", true),
+        new Route("chapter_edit","ChapterEditController", true),
+        new Route("chapter_create","ChapterCreateController", true),
+        new Route("manga_create","MangaCreateController",true),
         // 追加のルートをここに定義
 ];
 
@@ -37,27 +39,33 @@ foreach ($routes as $r) {
 //echo "<br/>matched_route: {$matched_route->getPath()} <br/>";
 
 if (!is_null($matched_route)) {
-    $controller = $matched_route->getController();
+    $controller_name = $matched_route->getController();
     
     // 未ログイン状態でログイン必須ページにアクセスした際は、エラーページに飛ばす
     if (!isset($_SESSION["user_id"]) && $matched_route->getLoginRequire()) {
-        $controller = "AuthorizedErrorController.php";
+        $controller_name = "AuthorizedErrorController";
     }
 } else {
     // ルートが定義されていない場合は404エラーページ
-    $controller = 'NotFoundController.php';
+    $controller_name = 'NotFoundController';
 }
 
-$controller_path = __DIR__ . '/controllers/' . $controller;
+$controller_name = "App\\Controller\\{$controller_name}";
+$controller = new $controller_name();
+$controller->get();
 
-// コントローラファイルが存在するか確認
-if (file_exists($controller_path)) {
-    include_once $controller_path;
-} else {
-    // コントローラファイルが存在しない場合は404エラーページ
-    header("HTTP/1.0 404 Not Found");
-    echo "404 Not Found";
-    exit();
-}
+// $controller_path = __DIR__ . '/controllers/' . $controller;
+
+// // コントローラファイルが存在するか確認
+// if (file_exists($controller_path)) {
+//     // include_once $controller_path;
+
+//     (new LoginController())->get();
+// } else {
+//     // コントローラファイルが存在しない場合は404エラーページ
+//     header("HTTP/1.0 404 Not Found");
+//     echo "404 Not Found";
+//     exit();
+// }
 
 ?>

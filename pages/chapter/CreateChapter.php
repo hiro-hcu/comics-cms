@@ -21,7 +21,7 @@ if ($mysqli->connect_error) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $name = htmlspecialchars($_POST["name"], ENT_QUOTES);
-    $start_date = date('Y-m-d', strtotime($_POST["start_date"]));
+    $start_date = date('Y-m-d H:i:s', strtotime($_POST["start_date"]));
     
     if (isset(($name))) {
         $sql = "INSERT INTO mst_chapters (`title_id`, `name`, `start_date`)values(?, ?, ?)";
